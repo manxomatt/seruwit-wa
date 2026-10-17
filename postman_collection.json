@@ -1,0 +1,389 @@
+{
+	"info": {
+		"_postman_id": "a931498b-70c8-472d-88b9-4c123d4e5f60",
+		"name": "Seruwit WA Gateway API",
+		"description": "Postman Collection untuk Seruwit WA Gateway (Multi-Tenant WhatsApp Engine berbasis Golang whatsmeow). Digunakan sebagai REST API penghubung notifikasi untuk seruwit-crm.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "api_key",
+			"value": "seruwit-secret-key-change-me",
+			"type": "string"
+		},
+		{
+			"key": "session_id",
+			"value": "tenant-001",
+			"type": "string"
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "key",
+				"value": "X-API-Key",
+				"type": "string"
+			},
+			{
+				"key": "value",
+				"value": "{{api_key}}",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Mengecek status hidup server gateway tanpa perlu API Key."
+			},
+			"response": [
+				{
+					"name": "Health Check Success",
+					"originalRequest": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"body": "{\n    \"status\": \"ok\",\n    \"time\": 1792279810\n}"
+				}
+			]
+		},
+		{
+			"name": "Sessions",
+			"item": [
+				{
+					"name": "Start Session / Generate QR",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"session_id\": \"{{session_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/sessions/start",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"start"
+							]
+						},
+						"description": "Menginisialisasi sesi WhatsApp untuk tenant dan menghasilkan QR Code dalam format Base64 PNG."
+					},
+					"response": [
+						{
+							"name": "QR Generated",
+							"originalRequest": {
+								"method": "POST",
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"session_id\": \"tenant-001\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/sessions/start",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"sessions",
+										"start"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"qr_base64\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...\",\n    \"session_id\": \"tenant-001\",\n    \"status\": \"SCAN_QR\",\n    \"success\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Pairing Code (Alternatif QR)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"phone\": \"628123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/sessions/pair-code",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"pair-code"
+							]
+						},
+						"description": "Menghasilkan kode 8-digit untuk menghubungkan WhatsApp tanpa scan QR dari HP lain."
+					},
+					"response": [
+						{
+							"name": "Pairing Code Success",
+							"originalRequest": {
+								"method": "POST",
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"session_id\": \"tenant-001\",\n    \"phone\": \"628123456789\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/sessions/pair-code",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"sessions",
+										"pair-code"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"pairing_code\": \"ABCD-1234\",\n    \"session_id\": \"tenant-001\",\n    \"success\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Session Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/sessions/{{session_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"{{session_id}}",
+								"status"
+							]
+						},
+						"description": "Mengecek status terkini sesi nomor tenant (CONNECTED, SCAN_QR, DISCONNECTED)."
+					},
+					"response": [
+						{
+							"name": "Connected Status",
+							"originalRequest": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/sessions/tenant-001/status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"sessions",
+										"tenant-001",
+										"status"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"phone\": \"628123456789\",\n    \"push_name\": \"Seruwit Admin\",\n    \"qr_base64\": \"\",\n    \"session_id\": \"tenant-001\",\n    \"status\": \"CONNECTED\",\n    \"success\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout Session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/sessions/{{session_id}}/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sessions",
+								"{{session_id}}",
+								"logout"
+							]
+						},
+						"description": "Memutuskan koneksi WhatsApp nomor tenant dan menghapus data sesi dari database."
+					},
+					"response": [
+						{
+							"name": "Logout Success",
+							"originalRequest": {
+								"method": "POST",
+								"url": {
+									"raw": "{{base_url}}/api/sessions/tenant-001/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"sessions",
+										"tenant-001",
+										"logout"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"message\": \"Session logged out and removed successfully\",\n    \"success\": true\n}"
+						}
+					]
+				}
+			],
+			"description": "Manajemen sesi WhatsApp (Inisialisasi, Pairing, Status, Logout)"
+		},
+		{
+			"name": "Messages",
+			"item": [
+				{
+					"name": "Send Text Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"to\": \"6281234567890\",\n    \"message\": \"Halo Budi, tagihan invoice #INV-2026-001 sebesar Rp 150.000 telah terbit. Silakan lakukan pembayaran sebelum 25 Oktober 2026.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/messages/send-text",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"send-text"
+							]
+						},
+						"description": "Mengirimkan pesan notifikasi teks ke nomor customer melalui sesi WhatsApp tenant."
+					},
+					"response": [
+						{
+							"name": "Message Sent Success",
+							"originalRequest": {
+								"method": "POST",
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"session_id\": \"tenant-001\",\n    \"to\": \"6281234567890\",\n    \"message\": \"Halo Budi, tagihan invoice #INV-2026-001 sebesar Rp 150.000 telah terbit.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/messages/send-text",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"messages",
+										"send-text"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"message_id\": \"3EB0ABCD1234567890\",\n    \"success\": true,\n    \"to\": \"6281234567890\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Pengiriman pesan / notifikasi WhatsApp"
+		}
+	]
+}

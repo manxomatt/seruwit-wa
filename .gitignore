@@ -1,0 +1,16 @@
+# Binaries
+bin/
+seruwit-wa
+
+# Environment variables
+.env
+
+# SQLite and session data
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# OS
+.DS_Store

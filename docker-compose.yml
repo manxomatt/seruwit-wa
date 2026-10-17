@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    container_name: seruwit-wa-app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - API_KEY=seruwit-secret-key-change-me
+      - DB_DIALECT=postgres
+      - DB_ADDRESS=postgres://wa_user:wa_secure_password@postgres:5432/seruwit_wa?sslmode=disable
+      - CRM_WEBHOOK_URL=http://host.docker.internal:8000/api/webhook/whatsapp
+      - CRM_WEBHOOK_SECRET=seruwit-crm-secret
+      - LOG_LEVEL=INFO
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: seruwit-wa-db
+    restart: always
+    environment:
+      POSTGRES_USER: wa_user
+      POSTGRES_PASSWORD: wa_secure_password
+      POSTGRES_DB: seruwit_wa
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

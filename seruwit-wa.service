@@ -1,0 +1,19 @@
+[Unit]
+Description=Seruwit WA Gateway Service
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/seruwit-wa
+ExecStart=/var/www/seruwit-wa/seruwit-wa
+Restart=always
+RestartSec=5s
+LimitNOFILE=65535
+
+# Environment file
+EnvironmentFile=/var/www/seruwit-wa/.env
+
+[Install]
+WantedBy=multi-user.target
